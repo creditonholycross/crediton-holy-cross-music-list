@@ -1,0 +1,150 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:id="@+id/widget_container"
+   style="@style/Widget.Android.AppWidget.Container"
+   android:layout_width="wrap_content"
+   android:layout_height="match_parent"
+   android:background="@android:color/black"
+   android:theme="@style/Theme.Android.AppWidgetContainer">
+   <LinearLayout
+       android:id="@+id/title"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center_horizontal"
+       >
+   <TextView
+       android:id="@+id/service_date"
+       style="@style/Widget.Android.AppWidget.InnerView"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="8dp"
+       android:layout_marginLeft="8dp"
+       android:background="@android:color/black"
+       android:text="Title"
+       android:textSize="16sp" />
+
+   <TextView
+       android:id="@+id/service_type"
+       style="@style/Widget.Android.AppWidget.InnerView"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="8dp"
+       android:layout_marginLeft="8dp"
+       android:background="@android:color/black"
+       android:text="Title"
+       android:textSize="16sp" />
+   </LinearLayout>
+
+   <LinearLayout
+       android:id="@+id/deets"
+       android:layout_below="@+id/title"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center_horizontal"
+       android:orientation="vertical">
+
+   <TextView
+       android:id="@+id/hymns"
+       style="@style/Widget.Android.AppWidget.InnerView"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:background="@android:color/black"
+       android:text="Title"
+       android:textSize="16sp"
+       android:gravity="center_horizontal"/>
+
+      <TextView
+          android:id="@+id/psalm"
+          style="@style/Widget.Android.AppWidget.InnerView"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@android:color/black"
+          android:text="Title"
+          android:textSize="16sp"
+          android:gravity="center_horizontal"/>
+   </LinearLayout>
+
+<!--   <LinearLayout-->
+<!--       android:id="@+id/hymns"-->
+<!--       android:layout_width="match_parent"-->
+<!--       android:layout_height="wrap_content"-->
+<!--       android:layout_below="@+id/title"-->
+<!--       android:gravity="center_horizontal">-->
+
+<!--      <TextView-->
+<!--          android:id="@+id/hymn1"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:text="100"-->
+<!--          android:textColor="@color/light_blue_50"-->
+<!--          android:background="@drawable/oval"-->
+<!--          android:layout_marginHorizontal="4dp"-->
+<!--          android:padding="8dp"/>-->
+
+<!--      <TextView-->
+<!--          android:id="@+id/hymn2"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:text="100"-->
+<!--          android:textColor="@color/light_blue_50"-->
+<!--          android:background="@drawable/oval"-->
+<!--          android:layout_marginHorizontal="4dp"-->
+<!--          android:padding="8dp"/>-->
+
+<!--      <TextView-->
+<!--          android:id="@+id/hymn3"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:text="100"-->
+<!--          android:textColor="@color/light_blue_50"-->
+<!--          android:background="@drawable/oval"-->
+<!--          android:layout_marginHorizontal="4dp"-->
+<!--          android:padding="8dp"/>-->
+
+<!--      <TextView-->
+<!--          android:id="@+id/hymn4"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:text="100"-->
+<!--          android:textColor="@color/light_blue_50"-->
+<!--          android:background="@drawable/oval"-->
+<!--          android:layout_marginHorizontal="4dp"-->
+<!--          android:padding="8dp"/>-->
+
+<!--      <TextView-->
+<!--          android:id="@+id/hymn5"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:text="100"-->
+<!--          android:textColor="@color/light_blue_50"-->
+<!--          android:background="@drawable/oval"-->
+<!--          android:layout_marginHorizontal="5dp"-->
+<!--          android:padding="8dp"/>-->
+
+<!--   </LinearLayout>-->
+
+<!--   <LinearLayout-->
+<!--       android:id="@+id/psalm"-->
+<!--       android:layout_width="match_parent"-->
+<!--       android:layout_height="wrap_content"-->
+<!--       android:layout_below="@+id/hymns"-->
+<!--       android:gravity="center_horizontal">-->
+
+<!--   <TextView-->
+<!--       android:layout_width="wrap_content"-->
+<!--       android:layout_height="wrap_content"-->
+<!--       android:layout_marginTop="8dp"-->
+<!--       android:layout_marginStart="8dp"-->
+<!--       android:layout_marginLeft="8dp"-->
+<!--       android:background="@drawable/streched_oval"-->
+<!--       android:text="Psalm 1"-->
+<!--       android:textSize="16sp"-->
+<!--       android:gravity="center_horizontal"-->
+<!--       android:paddingVertical="8dp"-->
+<!--       android:paddingHorizontal="12dp"/>-->
+
+<!--   </LinearLayout>-->
+
+
+</RelativeLayout>
