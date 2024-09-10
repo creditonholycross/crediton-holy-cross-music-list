@@ -1,4 +1,4 @@
-package com.example.flutter_cpc_music_list
+package com.kippz07.creditonparishchurchmusic
 
 import io.flutter.embedding.android.FlutterActivity
 

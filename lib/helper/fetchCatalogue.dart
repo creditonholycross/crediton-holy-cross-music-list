@@ -1,4 +1,5 @@
 import 'package:csv/csv.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_cpc_music_list/helper/dbFunctions.dart';
 import 'package:flutter_cpc_music_list/models/catalogue.dart';
 import 'package:flutter_cpc_music_list/models/music.dart';
@@ -18,18 +19,18 @@ Future<void> fetchCatalogue() async {
   // return await DbFunctions().getCatalogue();
 }
 
-void updateCatalogueDb() async {
+Future<void> updateCatalogueDb() async {
   print('updating db');
   final response = await http.get((Uri.parse(catalogueLink)));
   if (response.statusCode == 200) {
     var parsedCatalogue = parseCsv(response.body);
     if (parsedCatalogue.isEmpty) {
-      return null;
+      return;
     }
     await DbFunctions().deleteCatalogue();
     await DbFunctions().addCatalogue(parsedCatalogue);
   } else {
-    throw Exception('Failed to load music.');
+    return;
   }
 }
 

@@ -40,9 +40,13 @@ class _CataloguePageState extends State<CataloguePage> {
     'Upper'
   ];
 
+  late Future<List<Catalogue>?> catalogueFuture;
+
   @override
   void initState() {
     super.initState();
+
+    catalogueFuture = context.read<ServiceState>().filterCatalogueList();
   }
 
   @override
@@ -54,121 +58,151 @@ class _CataloguePageState extends State<CataloguePage> {
     var alphabetList = appState.alphabetList;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: const Text("Catalogue"),
-        actions: <Widget>[
-          IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () => showSearch(
-                  context: context,
-                  delegate: CatalogueSearchDelegate(
-                      catalogueList: catalogue as List<Catalogue>))),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () async {
-              updateCatalogueDb();
-              setState(() {
-                appState.setCatalogueList();
-              });
-            },
-          )
-        ],
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownMenu(
-                    initialSelection: seasonMenuEntries.first,
-                    onSelected: (String? value) {
-                      setState(() {
-                        appState.seasonMenuValue = value!;
-                        appState.filterCatalogueList();
-                        appState.setNavIndex(0);
-                        if (navScrollIndexMapping.isNotEmpty) {
-                          _scrollController.scrollTo(
-                              index: navScrollIndexMapping.values.toList()[0],
-                              duration: const Duration(milliseconds: 500));
-                        }
-                      });
-                    },
-                    dropdownMenuEntries: seasonMenuEntries
-                        .map<DropdownMenuEntry<String>>((String value) {
-                      return DropdownMenuEntry<String>(
-                          value: value, label: value);
-                    }).toList()),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownMenu(
-                    initialSelection: partsMenuEntries.first,
-                    onSelected: (String? value) {
-                      setState(() {
-                        appState.partsMenuValue = value!;
-                        appState.filterCatalogueList();
-                        appState.setNavIndex(0);
-                        if (navScrollIndexMapping.isNotEmpty) {
-                          _scrollController.scrollTo(
-                              index: navScrollIndexMapping.values.toList()[0],
-                              duration: const Duration(milliseconds: 500));
-                        }
-                      });
-                    },
-                    dropdownMenuEntries: partsMenuEntries
-                        .map<DropdownMenuEntry<String>>((String value) {
-                      return DropdownMenuEntry<String>(
-                          value: value, label: value);
-                    }).toList()),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: CatalogueWidget(catalogue: catalogue)),
-                SafeArea(child: LayoutBuilder(builder: (context, constraint) {
-                  if (navScrollIndexMapping.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(minHeight: constraint.maxHeight),
-                      child: IntrinsicHeight(
-                        child: NavigationRail(
-                          indicatorColor: Theme.of(context).colorScheme.primary,
-                          destinations: alphabetList
-                              .map<NavigationRailDestination>((String char) {
-                            return NavigationRailDestination(
-                                label: Text(char), icon: Text(char));
-                          }).toList(),
-                          selectedIndex: navIndex,
-                          onDestinationSelected: (value) {
-                            setState(() {
-                              appState.setNavIndex(value);
-                              _scrollController.scrollTo(
-                                  index: navScrollIndexMapping.values
-                                      .toList()[value],
-                                  duration: const Duration(milliseconds: 500));
-                            });
-                          },
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: const Text("Catalogue"),
+          actions: <Widget>[
+            IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () => showSearch(
+                    context: context,
+                    delegate: CatalogueSearchDelegate(
+                        catalogueList: catalogue as List<Catalogue>))),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () async {
+                updateCatalogueDb().then((data) => {
+                      DbFunctions().getCatalogue().then((data) => setState(() {
+                            appState.setCatalogueList(data);
+                          }))
+                    });
+              },
+            )
+          ],
+        ),
+        body: FutureBuilder(
+            future: catalogueFuture,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownMenu(
+                              initialSelection: seasonMenuEntries.first,
+                              onSelected: (String? value) {
+                                setState(() {
+                                  appState.seasonMenuValue = value!;
+                                  appState.filterCatalogueListNotify();
+                                  appState.setNavIndex(0);
+                                  if (navScrollIndexMapping.isNotEmpty) {
+                                    _scrollController.scrollTo(
+                                        index: navScrollIndexMapping.values
+                                            .toList()[0],
+                                        duration:
+                                            const Duration(milliseconds: 500));
+                                  }
+                                });
+                              },
+                              dropdownMenuEntries: seasonMenuEntries
+                                  .map<DropdownMenuEntry<String>>(
+                                      (String value) {
+                                return DropdownMenuEntry<String>(
+                                    value: value, label: value);
+                              }).toList()),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownMenu(
+                              initialSelection: partsMenuEntries.first,
+                              onSelected: (String? value) {
+                                setState(() {
+                                  appState.partsMenuValue = value!;
+                                  appState.filterCatalogueListNotify();
+                                  appState.setNavIndex(0);
+                                  if (navScrollIndexMapping.isNotEmpty) {
+                                    _scrollController.scrollTo(
+                                        index: navScrollIndexMapping.values
+                                            .toList()[0],
+                                        duration:
+                                            const Duration(milliseconds: 500));
+                                  }
+                                });
+                              },
+                              dropdownMenuEntries: partsMenuEntries
+                                  .map<DropdownMenuEntry<String>>(
+                                      (String value) {
+                                return DropdownMenuEntry<String>(
+                                    value: value, label: value);
+                              }).toList()),
+                        ),
+                      ],
+                    ),
+                    if (catalogue == null)
+                      const ListTile(
+                        title: Text('Catalogue is empty',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    if (catalogue != null)
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                child: CatalogueWidget(catalogue: catalogue)),
+                            SafeArea(child:
+                                LayoutBuilder(builder: (context, constraint) {
+                              if (navScrollIndexMapping.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              return SingleChildScrollView(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minHeight: constraint.maxHeight),
+                                  child: IntrinsicHeight(
+                                    child: NavigationRail(
+                                      indicatorColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      destinations: alphabetList
+                                          .map<NavigationRailDestination>(
+                                              (String char) {
+                                        return NavigationRailDestination(
+                                            label: Text(char),
+                                            icon: Text(char));
+                                      }).toList(),
+                                      selectedIndex: navIndex,
+                                      onDestinationSelected: (value) {
+                                        setState(() {
+                                          appState.setNavIndex(value);
+                                          _scrollController.scrollTo(
+                                              index: navScrollIndexMapping
+                                                  .values
+                                                  .toList()[value],
+                                              duration: const Duration(
+                                                  milliseconds: 500));
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }))
+                          ],
                         ),
                       ),
-                    ),
-                  );
-                }))
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+                  ],
+                );
+              }
+            }));
   }
 }
 

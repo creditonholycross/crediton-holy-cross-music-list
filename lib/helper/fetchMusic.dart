@@ -18,7 +18,7 @@ Future<Service?> fetchMusic() async {
   return await DbFunctions().getNextService();
 }
 
-void updateMusicDb() async {
+Future<void> updateMusicDb() async {
   print('updating db');
   final response = await http.get((Uri.parse(musicLink)));
   if (response.statusCode == 200) {

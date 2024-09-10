@@ -38,16 +38,18 @@ class MyApp extends StatelessWidget {
 
 class ServiceState extends ChangeNotifier {
   late Service currentService;
-  late Service? nextService;
+  Service? nextService;
   List<Service>? serviceList;
   List<Catalogue>? catalogueList;
   List<Catalogue>? filteredCatalogueList;
   String seasonMenuValue = 'season (all)';
   String partsMenuValue = 'parts (all)';
   int navIndex = 0;
-  late Map<String, int> navScrollIndexMapping;
+  Map<String, int> navScrollIndexMapping = {};
   var alphabetList =
       List.generate(26, (index) => String.fromCharCode(index + 65));
+  bool initMusicSpinner = true;
+  bool initCatalogueSpinner = true;
 
   void setCurrentService(Service service) {
     currentService = service;
@@ -79,20 +81,14 @@ class ServiceState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setCatalogueList() async {
-    final catalogue = await DbFunctions().getCatalogue();
+  Future<void> setCatalogueList(List<Catalogue>? catalogue) async {
     catalogueList = catalogue;
-    filterCatalogueList();
+    filterCatalogueListNotify();
     print('catalogue set');
     notifyListeners();
   }
 
-  // Future<void> updateCatalogueList() async {
-  //   updateCatalogueList();
-  //   setCatalogueList();
-  // }
-
-  Future<void> filterCatalogueList() async {
+  Future<List<Catalogue>?> filterCatalogueList() async {
     var filteredList = catalogueList;
     if (seasonMenuValue.toLowerCase() != 'season (all)') {
       final filteredSeasonCatalogue = filteredList
@@ -113,7 +109,11 @@ class ServiceState extends ChangeNotifier {
     if (filteredList != null) {
       setnavScrollIndexMapping(filteredList);
     }
+    return filteredCatalogueList;
+  }
 
+  void filterCatalogueListNotify() {
+    filterCatalogueList();
     notifyListeners();
   }
 
@@ -161,23 +161,58 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<Service?> futureNextService;
-  late Service? upcomingService;
-  final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
+  // late Future<Service?> futureNextService;
+  Service? upcomingService;
+  List<Service>? serviceList = <Service>[];
+  int? catalogueCount = 0;
   static const String sundayBySundayUrl = 'https://sbs.rscm.org.uk/';
 
   @override
   void initState() {
+    DbFunctions().getServiceList().then((data) => setState(() {
+          context.read<ServiceState>().serviceList = data;
+          serviceList = data;
+          if (data == null) {
+            updateMusicDb().then((data) => {
+                  DbFunctions().getServiceList().then((data) => setState(() {
+                        context.read<ServiceState>().serviceList = data;
+                        serviceList = data;
+                        DbFunctions()
+                            .getNextService()
+                            .then((data) => setState(() {
+                                  context.read<ServiceState>().nextService =
+                                      data;
+                                  context
+                                      .read<ServiceState>()
+                                      .initMusicSpinner = false;
+                                }));
+                      }))
+                });
+          } else {
+            DbFunctions().getNextService().then((data) => setState(() {
+                  context.read<ServiceState>().nextService = data;
+                  context.read<ServiceState>().initMusicSpinner = false;
+                }));
+          }
+        }));
+
+    DbFunctions().getCatalogueCount().then((data) => setState(() {
+          catalogueCount = data;
+          if (catalogueCount == 0) {
+            print('fetching catalogue');
+            updateCatalogueDb().then((data) => {
+                  DbFunctions().getCatalogue().then((data) => setState(() {
+                        context.read<ServiceState>().catalogueList = data;
+                      }))
+                });
+          } else {
+            DbFunctions().getCatalogue().then((data) => setState(() {
+                  context.read<ServiceState>().catalogueList = data;
+                }));
+          }
+        }));
+
     super.initState();
-    futureNextService = fetchMusic();
-    fetchCatalogue();
-    if (context.mounted) {
-      Future.microtask(() => context.read<ServiceState>().initNextService());
-      // Future.microtask(() => context.read<ServiceState>().setCatalogueList());
-    }
-    setState(() {
-      context.read<ServiceState>().setCatalogueList();
-    });
   }
 
   @override
@@ -193,7 +228,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: const Icon(Icons.refresh),
                 onPressed: () async {
                   setState(() {
-                    updateMusicDb();
+                    updateMusicDb().then((data) => {
+                          DbFunctions()
+                              .getServiceList()
+                              .then((data) => setState(() {
+                                    context.read<ServiceState>().serviceList =
+                                        data;
+                                    serviceList = data;
+                                    DbFunctions()
+                                        .getNextService()
+                                        .then((data) => setState(() {
+                                              context
+                                                  .read<ServiceState>()
+                                                  .nextService = data;
+                                              context
+                                                  .read<ServiceState>()
+                                                  .initMusicSpinner = false;
+                                            }));
+                                  }))
+                        });
                   });
                 },
               )
@@ -202,71 +255,60 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: [
               const ImageSection(image: 'images/church.png'),
-              FutureBuilder(
-                  future: futureNextService,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && appState.nextService != null) {
-                      Service nextService = snapshot.data!;
-                      updateNextServiceWidget(nextService);
-                      var date = dateFormatter
-                          .format(DateTime.parse(appState.nextService!.date));
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: const Text('Next service:',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Text(
-                                '$date - ${appState.nextService!.serviceType}'),
-                          ),
-                          Card(
-                            child: ListTile(
-                              title: const Text('View next service',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              onTap: () {
-                                appState
-                                    .setCurrentService(appState.nextService!);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ServiceMusicPage()),
-                                );
-                              },
-                            ),
-                          ),
-                          Card(
-                            child: ListTile(
-                              title: const Text('View upcoming services',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              onTap: () async {
-                                appState.setServiceList();
-
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ServiceListPage()),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    } else if (snapshot.hasError) {
-                      if (snapshot.error.toString() ==
-                          'Bad state: No element') {
-                        return const ListTile(
-                          title: Text('No upcoming services',
+              if (!appState.initMusicSpinner)
+                Column(
+                  children: [
+                    if (appState.nextService == null)
+                      const ListTile(
+                        title: Text('Next service:',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('No upcoming services'),
+                      ),
+                    if (appState.nextService != null)
+                      ListTile(
+                        title: const Text('Next service:',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(
+                            '${Music.parseDate(appState.nextService!.date)} - ${appState.nextService!.serviceType}'),
+                      ),
+                    if (appState.nextService != null)
+                      Card(
+                        child: ListTile(
+                          title: const Text('View next service',
                               style: TextStyle(fontWeight: FontWeight.bold)),
-                        );
-                      }
-                      return Text('${snapshot.error}');
-                    }
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
-                    );
-                  }),
+                          onTap: () {
+                            appState.setCurrentService(appState.nextService!);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ServiceMusicPage()),
+                            );
+                          },
+                        ),
+                      ),
+                    if (appState.nextService != null)
+                      Card(
+                        child: ListTile(
+                          title: const Text('View upcoming services',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: () async {
+                            appState.setServiceList();
+
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ServiceListPage()),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                )
+              else
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(),
+                ),
               Card(
                 child: ListTile(
                   title: const Text('Sunday by Sunday login',
@@ -313,8 +355,6 @@ class ServiceListPage extends StatefulWidget {
 }
 
 class _ServiceListPageState extends State<ServiceListPage> {
-  static final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
-
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<ServiceState>();
@@ -350,8 +390,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
                   shrinkWrap: true,
                   itemCount: serviceList!.length,
                   itemBuilder: (context, index) {
-                    var date = dateFormatter
-                        .format(DateTime.parse(serviceList[index].date));
+                    var date = Music.parseDate(serviceList[index].date);
                     return ListTile(
                       title: Text(date,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -379,8 +418,6 @@ class _ServiceListPageState extends State<ServiceListPage> {
 class ServiceMusicPage extends StatelessWidget {
   const ServiceMusicPage({super.key});
 
-  static final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
-
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<ServiceState>();
@@ -388,10 +425,8 @@ class ServiceMusicPage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title:
-              Text(dateFormatter.format(DateTime.parse(currentService.date))),
-        ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            title: Text(Music.parseDate(currentService.date))),
         body: SingleChildScrollView(
           child: Column(
             children: [
