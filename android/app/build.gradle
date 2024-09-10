@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flutter_cpc_music_list"
+    namespace = "com.kippz07.creditonparishchurchmusic"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,10 +21,10 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.flutter_cpc_music_list"
+        applicationId = "com.kippz07.creditonparishchurchmusic"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 24
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -44,4 +44,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("com.google.android.material:material:1.12.0")
 }
