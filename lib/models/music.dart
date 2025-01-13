@@ -82,6 +82,24 @@ class Music {
             title: title.toString(),
             composer: composer,
             link: link),
+      {
+        'id': String id,
+        'service_date': String date,
+        'service_time': int time,
+        'serviceType': String serviceType,
+        'musicType': String musicType,
+        'title': String title,
+        'composer': String? composer,
+        'link': String? link
+      } =>
+        Music(
+            date: date,
+            time: time.toString(),
+            serviceType: serviceType,
+            musicType: musicType,
+            title: title.toString(),
+            composer: composer,
+            link: link),
       _ => throw const FormatException('Failed to load music.'),
     };
   }

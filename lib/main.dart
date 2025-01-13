@@ -3,6 +3,7 @@ import 'package:flutter_cpc_music_list/helper/dbFunctions.dart';
 import 'package:flutter_cpc_music_list/helper/fetchCatalogue.dart';
 import 'package:flutter_cpc_music_list/helper/fetchMusic.dart';
 import 'package:flutter_cpc_music_list/helper/navScroll.dart';
+import 'package:flutter_cpc_music_list/helper/wear_os.dart';
 import 'package:flutter_cpc_music_list/models/catalogue.dart';
 import 'package:flutter_cpc_music_list/models/music.dart';
 import 'package:flutter_cpc_music_list/models/service.dart';
@@ -27,10 +28,10 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => ServiceState(),
       child: MaterialApp(
-        title: 'CPC Music',
+        title: 'Holy Cross Music',
         theme: GlobalThemeData.lightThemeData,
         darkTheme: GlobalThemeData.darkThemeData,
-        home: const MyHomePage(title: 'CPC Music'),
+        home: const MyHomePage(title: 'Holy Cross Music'),
       ),
     );
   }
@@ -185,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   context
                                       .read<ServiceState>()
                                       .initMusicSpinner = false;
+                                  wearOsSync(data);
                                 }));
                       }))
                 });
@@ -192,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
             DbFunctions().getNextService().then((data) => setState(() {
                   context.read<ServiceState>().nextService = data;
                   context.read<ServiceState>().initMusicSpinner = false;
+                  wearOsSync(data);
                 }));
           }
         }));
@@ -244,6 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               context
                                                   .read<ServiceState>()
                                                   .initMusicSpinner = false;
+                                              wearOsSync(data);
                                             }));
                                   }))
                         });

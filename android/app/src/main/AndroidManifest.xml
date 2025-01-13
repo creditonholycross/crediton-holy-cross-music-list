@@ -20,7 +20,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_3_round"
-        android:label="CPC Music List">
+        android:label="Holy Cross Music">
         <receiver
             android:name=".NextServiceWidget"
             android:exported="false">
