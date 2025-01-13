@@ -47,21 +47,22 @@ class MusicDatabaseHelper {
     var timeFormatter = DateFormat('HHmmss');
     String formattedTime = timeFormatter.format(now);
     var result = await db.rawQuery(
-        'SELECT *, DATE(service_date) as service_date_1 FROM $musicTable WHERE service_date >= $formattedDate AND service_time >= $formattedTime');
-    var result2 = await db.rawQuery(
-        'SELECT *, DATE(service_date) as service_date_1 FROM $musicTable');
+        'SELECT *, service_date || substr("000000"||service_time, -6, 6) as service_datetime FROM $musicTable WHERE CAST(service_datetime as integer) >= $formattedDate$formattedTime ORDER BY service_date');
+    // var result = await db.rawQuery(
+    //     'SELECT *, service_date || substr("000000"||service_time, -6, 6)  as service_datetime FROM $musicTable ORDER BY service_date');
     return result;
   }
 
   Future<List<Map<String, dynamic>?>> getNextService() async {
     Database db = await database;
     var now = DateTime.now();
-    var formatter = DateFormat('ddMMyyyy');
+    var formatter = DateFormat('yyyyMMdd');
     String formattedDate = formatter.format(now);
     var timeFormatter = DateFormat('HHmmss');
     String formattedTime = timeFormatter.format(now);
     var result = await db.rawQuery(
-        'WITH nextService(service_date, serviceType) as (SELECT DISTINCT service_date, serviceType FROM $musicTable WHERE service_date >= $formattedDate AND service_time >= $formattedTime ORDER BY service_date, service_time ASC LIMIT 1) SELECT * FROM $musicTable, nextService WHERE $musicTable.service_date = nextService.service_date AND $musicTable.serviceType = nextService.serviceType');
+        'WITH nextService(serviceType, service_date, service_time, service_datetime) as (SELECT DISTINCT serviceType, service_date, service_time, service_date || substr("000000"||service_time, -6, 6) as service_datetime FROM $musicTable WHERE CAST(service_datetime as integer) >= $formattedDate$formattedTime ORDER BY service_date, service_time ASC LIMIT 1) SELECT * FROM $musicTable, nextService WHERE $musicTable.service_date = nextService.service_date AND $musicTable.serviceType = nextService.serviceType');
+
     if (result.isEmpty) {
       return List.empty();
     }
