@@ -444,6 +444,7 @@ class ServiceMusicPage extends StatelessWidget {
               ),
               ListView.builder(
                 scrollDirection: Axis.vertical,
+                physics: const ScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: currentService.music.length,
                 itemBuilder: (context, index) {
@@ -452,12 +453,14 @@ class ServiceMusicPage extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 8),
-                        child: Text(
-                          currentService.music[index].musicType,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                          // textAlign: TextAlign.left,
-                        ),
+                        child: currentService.music[index].musicType != ''
+                            ? Text(
+                                currentService.music[index].musicType,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                // textAlign: TextAlign.left,
+                              )
+                            : null,
                       ),
                       MusicElementWidget(music: currentService.music[index])
                     ],
@@ -485,15 +488,47 @@ class MusicElementWidget extends StatelessWidget {
         title: Text(music!.title),
         subtitle: Text(
           music!.composer as String,
-          style: const TextStyle(fontStyle: FontStyle.italic),
+          style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 16),
         ),
         trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
       );
     }
     return ListTile(
-      title: Text(music!.title),
+      title: TitleFormatting(music: music),
       trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
     );
+  }
+}
+
+class TitleFormatting extends StatelessWidget {
+  TitleFormatting({
+    super.key,
+    required this.music,
+  });
+
+  final Music? music;
+
+  final psalmRegex = RegExp(r'v\d{1,2}');
+
+  @override
+  Widget build(BuildContext context) {
+    var psalmVerse = '';
+    var musicTitle = music!.title;
+
+    if (psalmRegex.hasMatch(music!.title)) {
+      var psalmSplit = music!.title.split('v');
+      psalmVerse = ' v${psalmSplit[1]}';
+      musicTitle = psalmSplit[0].trim();
+    }
+
+    return RichText(
+        text: TextSpan(children: [
+      TextSpan(text: musicTitle, style: const TextStyle(fontSize: 16)),
+      if (psalmVerse != '')
+        TextSpan(
+            text: psalmVerse,
+            style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14))
+    ]));
   }
 }
 
