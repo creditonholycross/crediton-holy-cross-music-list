@@ -392,6 +392,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
                 ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
+                  physics: const ScrollPhysics(),
                   itemCount: serviceList!.length,
                   itemBuilder: (context, index) {
                     var date = Music.parseDate(serviceList[index].date);
@@ -483,16 +484,24 @@ class MusicElementWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (music!.title == '') {
+      return ListTile(
+        title: Text(music!.composer as String,
+            style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14)),
+        trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
+      );
+    }
     if (music!.composer != '') {
       return ListTile(
         title: Text(music!.title),
         subtitle: Text(
           music!.composer as String,
-          style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 16),
+          style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
         ),
         trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
       );
     }
+
     return ListTile(
       title: TitleFormatting(music: music),
       trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
@@ -510,23 +519,31 @@ class TitleFormatting extends StatelessWidget {
 
   final psalmRegex = RegExp(r'v\d{1,2}');
 
+  final hymnRegex = RegExp(r'\d{1,2}#');
+
   @override
   Widget build(BuildContext context) {
-    var psalmVerse = '';
+    var titleItalics = '';
     var musicTitle = music!.title;
 
     if (psalmRegex.hasMatch(music!.title)) {
       var psalmSplit = music!.title.split('v');
-      psalmVerse = ' v${psalmSplit[1]}';
+      titleItalics = ' v${psalmSplit[1]}';
       musicTitle = psalmSplit[0].trim();
     }
 
-    return RichText(
-        text: TextSpan(children: [
-      TextSpan(text: musicTitle, style: const TextStyle(fontSize: 16)),
-      if (psalmVerse != '')
+    if (music!.musicType.toLowerCase().contains('hymn') &&
+        hymnRegex.hasMatch(music!.title)) {
+      var hymnSplit = music!.title.split('#');
+      titleItalics = ' ${hymnSplit.sublist(1).join(' ').trim()}';
+      musicTitle = hymnSplit[0];
+    }
+
+    return Text.rich(TextSpan(children: [
+      TextSpan(text: musicTitle),
+      if (titleItalics != '')
         TextSpan(
-            text: psalmVerse,
+            text: titleItalics,
             style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14))
     ]));
   }
