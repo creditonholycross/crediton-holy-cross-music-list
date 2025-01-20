@@ -258,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const ImageSection(image: 'images/church.png'),
+              const ImageSection(image: 'images/church.jpg'),
               if (!appState.initMusicSpinner)
                 Column(
                   children: [
@@ -486,6 +486,7 @@ class MusicElementWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (music!.title == '') {
       return ListTile(
+        visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
         title: Text(music!.composer as String,
             style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14)),
         trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
@@ -493,6 +494,7 @@ class MusicElementWidget extends StatelessWidget {
     }
     if (music!.composer != '') {
       return ListTile(
+        visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
         title: Text(music!.title),
         subtitle: Text(
           music!.composer as String,
@@ -502,10 +504,7 @@ class MusicElementWidget extends StatelessWidget {
       );
     }
 
-    return ListTile(
-      title: TitleFormatting(music: music),
-      trailing: music!.link != '' ? PlayLinkWidget(music: music) : null,
-    );
+    return TitleFormatting(music: music);
   }
 }
 
@@ -519,7 +518,7 @@ class TitleFormatting extends StatelessWidget {
 
   final psalmRegex = RegExp(r'v\d{1,2}');
 
-  final hymnRegex = RegExp(r'\d{1,2}#');
+  // final hymnRegex = RegExp(r'#');
 
   @override
   Widget build(BuildContext context) {
@@ -532,20 +531,22 @@ class TitleFormatting extends StatelessWidget {
       musicTitle = psalmSplit[0].trim();
     }
 
-    if (music!.musicType.toLowerCase().contains('hymn') &&
-        hymnRegex.hasMatch(music!.title)) {
+    if (music!.title.contains('#')) {
       var hymnSplit = music!.title.split('#');
       titleItalics = ' ${hymnSplit.sublist(1).join(' ').trim()}';
       musicTitle = hymnSplit[0];
     }
 
-    return Text.rich(TextSpan(children: [
-      TextSpan(text: musicTitle),
-      if (titleItalics != '')
-        TextSpan(
-            text: titleItalics,
-            style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14))
-    ]));
+    return Padding(
+        padding: const EdgeInsets.only(left: 16, top: 4, bottom: 4),
+        child: Text.rich(TextSpan(children: [
+          TextSpan(text: musicTitle, style: const TextStyle(fontSize: 16)),
+          if (titleItalics != '')
+            TextSpan(
+                text: titleItalics,
+                style:
+                    const TextStyle(fontStyle: FontStyle.italic, fontSize: 14))
+        ])));
   }
 }
 
