@@ -1,6 +1,8 @@
 import 'package:flutter_cpc_music_list/models/catalogue.dart';
 import 'package:flutter_cpc_music_list/models/music.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class CatalogueDatabaseHelper {
   static CatalogueDatabaseHelper? _catalogueDatabaseHelper;
@@ -14,8 +16,13 @@ class CatalogueDatabaseHelper {
   }
 
   Future<Database> initialiseDatabase() async {
-    final databasePath = await getDatabasesPath();
-    final path = '$databasePath/$catalogueTable';
+    var path = "";
+    if (!kIsWeb) {
+      final databasePath = await getDatabasesPath();
+      path = '$databasePath/$catalogueTable';
+    } else {
+      path = '/db/path/$catalogueTable';
+    }
     print('Opening db $catalogueTable');
 
     var catalogueDatabase =
