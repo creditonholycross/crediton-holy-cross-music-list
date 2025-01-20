@@ -1,6 +1,6 @@
 {
-    "name": "flutter_cpc_music_list",
-    "short_name": "flutter_cpc_music_list",
+    "name": "flutter_ccp_music_list",
+    "short_name": "flutter_ccp_music_list",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
