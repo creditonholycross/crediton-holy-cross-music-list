@@ -28,7 +28,12 @@ Future<void> wearOsSync(Service? nextService) async {
         nextService.music.firstWhereOrNull((x) => x.musicType.contains("Hymn"));
 
     hymns ??= const Music(
-        date: '', time: '', serviceType: '', musicType: '', title: '-');
+        date: '',
+        time: '',
+        rehearsalTime: '',
+        serviceType: '',
+        musicType: '',
+        title: '-');
 
     hymnTitle == hymns.title;
   }
@@ -39,7 +44,12 @@ Future<void> wearOsSync(Service? nextService) async {
       nextService.music.firstWhereOrNull((x) => x.musicType.contains("Psalm"));
 
   psalm ??= const Music(
-      date: '', time: '', serviceType: '', musicType: '', title: '-');
+      date: '',
+      time: '',
+      rehearsalTime: '',
+      serviceType: '',
+      musicType: '',
+      title: '-');
 
   var watchData = {
     "serviceType": nextService.serviceType,
