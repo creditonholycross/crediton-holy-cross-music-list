@@ -7,7 +7,11 @@ import 'package:flutter_cpc_music_list/models/catalogue.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-ItemScrollController _scrollController = ItemScrollController();
+final ItemScrollController _scrollController = ItemScrollController();
+final ScrollOffsetController scrollOffsetController = ScrollOffsetController();
+final ItemPositionsListener itemPositionsListener =
+    ItemPositionsListener.create();
+final ScrollOffsetListener scrollOffsetListener = ScrollOffsetListener.create();
 
 class CataloguePage extends StatefulWidget {
   const CataloguePage({super.key});
@@ -104,7 +108,8 @@ class _CataloguePageState extends State<CataloguePage> {
                                   appState.seasonMenuValue = value!;
                                   appState.filterCatalogueListNotify();
                                   appState.setNavIndex(0);
-                                  if (navScrollIndexMapping.isNotEmpty) {
+                                  if (navScrollIndexMapping.isNotEmpty &&
+                                      _scrollController.isAttached) {
                                     _scrollController.scrollTo(
                                         index: navScrollIndexMapping.values
                                             .toList()[0],
@@ -129,7 +134,8 @@ class _CataloguePageState extends State<CataloguePage> {
                                   appState.partsMenuValue = value!;
                                   appState.filterCatalogueListNotify();
                                   appState.setNavIndex(0);
-                                  if (navScrollIndexMapping.isNotEmpty) {
+                                  if (navScrollIndexMapping.isNotEmpty &&
+                                      _scrollController.isAttached) {
                                     _scrollController.scrollTo(
                                         index: navScrollIndexMapping.values
                                             .toList()[0],
@@ -161,7 +167,8 @@ class _CataloguePageState extends State<CataloguePage> {
                                 child: CatalogueWidget(catalogue: catalogue)),
                             SafeArea(child:
                                 LayoutBuilder(builder: (context, constraint) {
-                              if (navScrollIndexMapping.isEmpty) {
+                              if (navScrollIndexMapping.isEmpty &&
+                                  _scrollController.isAttached) {
                                 return const SizedBox.shrink();
                               }
                               return SingleChildScrollView(
@@ -183,12 +190,14 @@ class _CataloguePageState extends State<CataloguePage> {
                                       onDestinationSelected: (value) {
                                         setState(() {
                                           appState.setNavIndex(value);
-                                          _scrollController.scrollTo(
-                                              index: navScrollIndexMapping
-                                                  .values
-                                                  .toList()[value],
-                                              duration: const Duration(
-                                                  milliseconds: 500));
+                                          if (_scrollController.isAttached) {
+                                            _scrollController.scrollTo(
+                                                index: navScrollIndexMapping
+                                                    .values
+                                                    .toList()[value],
+                                                duration: const Duration(
+                                                    milliseconds: 500));
+                                          }
                                         });
                                       },
                                     ),
@@ -218,6 +227,9 @@ class CatalogueWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScrollablePositionedList.builder(
       itemScrollController: _scrollController,
+      scrollOffsetController: scrollOffsetController,
+      itemPositionsListener: itemPositionsListener,
+      scrollOffsetListener: scrollOffsetListener,
       scrollDirection: Axis.vertical,
       physics: const ScrollPhysics(),
       shrinkWrap: true,
