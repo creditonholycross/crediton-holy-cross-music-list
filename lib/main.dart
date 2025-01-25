@@ -9,13 +9,18 @@ import 'package:flutter_cpc_music_list/models/music.dart';
 import 'package:flutter_cpc_music_list/models/service.dart';
 import 'package:flutter_cpc_music_list/screens/catalogueScreen.dart';
 import 'package:flutter_cpc_music_list/themes/themes.dart';
-import 'package:get/get_common/get_reset.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
+  if (kIsWeb) {
+    // Initialize FFI
+    databaseFactory = databaseFactoryFfiWeb;
+  }
   runApp(const MyApp());
 }
 
