@@ -44,7 +44,7 @@ class Music {
             title: title,
             composer: composer,
             link: link),
-      _ => throw const FormatException('Failed to load music.'),
+      _ => throw const FormatException('Failed to load music from csv.'),
     };
   }
 
@@ -110,7 +110,7 @@ class Music {
             title: title.toString(),
             composer: composer,
             link: link),
-      _ => throw const FormatException('Failed to load music.'),
+      _ => throw const FormatException('Failed to load music from db.'),
     };
   }
 

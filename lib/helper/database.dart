@@ -27,7 +27,7 @@ class MusicDatabaseHelper {
 
   void _createTable(Database db, int newVersion) async {
     var query =
-        'CREATE TABLE $musicTable (id STRING PRIMARY KEY, service_date INT, service_time INT, rehearsalTime INT serviceType String, musicType STRING, title STRING, composer STRING, link STRING)';
+        'CREATE TABLE $musicTable (id STRING PRIMARY KEY, service_date INT, service_time INT, rehearsalTime INT, serviceType String, musicType STRING, title STRING, composer STRING, link STRING)';
     print('Executing query $query');
     await db.execute(query);
     print('Table created');
