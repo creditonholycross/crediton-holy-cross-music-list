@@ -47,12 +47,12 @@ List<Catalogue> parseCsv(String csv) {
   return catalogueList;
 }
 
-List<Service> groupMusic(List<Music> musicList) {
-  var newMap = groupBy(musicList, (item) => '${item.date},${item.serviceType}');
+// List<Service> groupMusic(List<Music> musicList) {
+//   var newMap = groupBy(musicList, (item) => '${item.date},${item.serviceType}');
 
-  var serviceList = <Service>[];
+//   var serviceList = <Service>[];
 
-  newMap.forEach((k, v) => serviceList.add(
-      Service(date: k.split(',')[0], serviceType: k.split(',')[1], music: v)));
-  return serviceList;
-}
+//   newMap.forEach((k, v) => serviceList.add(
+//       Service(date: k.split(',')[0], serviceType: k.split(',')[1], music: v)));
+//   return serviceList;
+// }

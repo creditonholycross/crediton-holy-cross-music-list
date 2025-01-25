@@ -4,9 +4,13 @@ import 'package:flutter_cpc_music_list/models/music.dart';
 import 'package:flutter_cpc_music_list/models/service.dart';
 import 'package:http/http.dart' as http;
 import "package:collection/collection.dart";
+import 'package:flutter/foundation.dart';
 
 var musicLink =
     'https://docs.google.com/spreadsheets/d/1r71O_Bm_-dkKBTtyAPMYMfhh1lg5-MwypKAnEs2eYkQ/gviz/tq?tqx=out:csv&sheet=schedule';
+
+var testingMusicLink =
+    'https://docs.google.com/spreadsheets/d/1r71O_Bm_-dkKBTtyAPMYMfhh1lg5-MwypKAnEs2eYkQ/gviz/tq?tqx=out:csv&sheet=testing';
 
 Future<Service?> fetchMusic() async {
   print('fetching music');
@@ -20,7 +24,16 @@ Future<Service?> fetchMusic() async {
 
 Future<void> updateMusicDb() async {
   print('updating db');
-  final response = await http.get((Uri.parse(musicLink)));
+
+  String musicURI;
+
+  if (kReleaseMode) {
+    musicURI = musicLink;
+  } else {
+    musicURI = testingMusicLink;
+  }
+
+  final response = await http.get((Uri.parse(musicURI)));
   if (response.statusCode == 200) {
     var parsedMusic = parseCsv(response.body);
     if (parsedMusic.isEmpty) {
@@ -51,7 +64,11 @@ List<Service> groupMusic(List<Music> musicList) {
 
   var serviceList = <Service>[];
 
-  newMap.forEach((k, v) => serviceList.add(
-      Service(date: k.split(',')[0], serviceType: k.split(',')[1], music: v)));
+  newMap.forEach((k, v) => serviceList.add(Service(
+      date: k.split(',')[0],
+      time: v[0].time,
+      rehearsalTime: v[0].rehearsalTime,
+      serviceType: k.split(',')[1],
+      music: v)));
   return serviceList;
 }

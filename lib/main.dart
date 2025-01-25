@@ -399,8 +399,20 @@ class _ServiceListPageState extends State<ServiceListPage> {
                     return ListTile(
                       title: Text(date,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(serviceList![index].serviceType),
+                      subtitle: Text.rich(TextSpan(children: [
+                        TextSpan(
+                            text: serviceList![index].serviceType,
+                            style: const TextStyle(fontSize: 16)),
+                        TextSpan(
+                            text:
+                                ' \nRehearsal - ${Music.formatTime(serviceList![index].rehearsalTime)}\nService - ${Music.formatTime(serviceList![index].time)}',
+                            style: const TextStyle(
+                                fontStyle: FontStyle.italic, fontSize: 14))
+                      ])),
+                      // subtitle: Text(
+                      //     '${serviceList![index].serviceType} \nRehearsal - ${serviceList![index].rehearsalTime}\nService - ${serviceList![index].time}'),
                       trailing: const Icon(Icons.info_outline),
+                      isThreeLine: true,
                       onTap: () {
                         appState.setCurrentService(serviceList[index]);
                         Navigator.of(context).push(
