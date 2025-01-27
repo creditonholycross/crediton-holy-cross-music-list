@@ -92,9 +92,9 @@ class Music {
             link: link),
       {
         'id': String id,
-        'service_date': String date,
+        'service_date': int date,
         'service_time': int time,
-        'rehearsalTime': int? rehearsalTime,
+        'rehearsalTime': String? rehearsalTime,
         'serviceType': String serviceType,
         'musicType': String musicType,
         'title': String title,
@@ -102,9 +102,29 @@ class Music {
         'link': String? link
       } =>
         Music(
-            date: date,
+            date: date.toString(),
             time: time.toString(),
-            rehearsalTime: rehearsalTime.toString(),
+            rehearsalTime: rehearsalTime,
+            serviceType: serviceType,
+            musicType: musicType,
+            title: title.toString(),
+            composer: composer,
+            link: link),
+      {
+        'id': String id,
+        'service_date': int date,
+        'service_time': int time,
+        'rehearsalTime': String? rehearsalTime,
+        'serviceType': String serviceType,
+        'musicType': String musicType,
+        'title': int title,
+        'composer': String? composer,
+        'link': String? link
+      } =>
+        Music(
+            date: date.toString(),
+            time: time.toString(),
+            rehearsalTime: rehearsalTime,
             serviceType: serviceType,
             musicType: musicType,
             title: title.toString(),
@@ -136,7 +156,11 @@ class Music {
 
   static String formatTime(String? time) {
     if (time == null) {
-      return 'none';
+      return 'N/A';
+    } else if (time == '') {
+      return 'N/A';
+    } else if (double.tryParse(time) == null) {
+      return time;
     }
     var paddedTime = time.padLeft(6, '0');
     return '${paddedTime.substring(0, 2)}:${paddedTime.substring(2, 4)}';
