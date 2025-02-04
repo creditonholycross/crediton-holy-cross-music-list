@@ -59,7 +59,8 @@ class MusicDatabaseHelper {
     var formatter = DateFormat('yyyyMMdd');
     String formattedDate = formatter.format(now);
     var timeFormatter = DateFormat('HHmmss');
-    String formattedTime = timeFormatter.format(now);
+    String formattedTime =
+        timeFormatter.format(now.subtract(const Duration(hours: 2)));
     List<Map<String, dynamic>>? result;
 
     if (kIsWeb) {
@@ -79,7 +80,8 @@ class MusicDatabaseHelper {
     var formatter = DateFormat('yyyyMMdd');
     String formattedDate = formatter.format(now);
     var timeFormatter = DateFormat('HHmmss');
-    String formattedTime = timeFormatter.format(now);
+    String formattedTime =
+        timeFormatter.format(now.subtract(const Duration(hours: 2)));
     List<Map<String, dynamic>>? result;
 
     if (kIsWeb) {

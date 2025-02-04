@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cpc_music_list/helper/dbFunctions.dart';
 import 'package:flutter_cpc_music_list/helper/fetchCatalogue.dart';
@@ -6,6 +8,8 @@ import 'package:flutter_cpc_music_list/main.dart';
 import 'package:flutter_cpc_music_list/models/catalogue.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:fluttertoast/fluttertoast.dart';
 
 final ItemScrollController _scrollController = ItemScrollController();
 final ScrollOffsetController scrollOffsetController = ScrollOffsetController();
@@ -74,13 +78,23 @@ class _CataloguePageState extends State<CataloguePage> {
                         catalogueList: catalogue as List<Catalogue>))),
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () async {
-                updateCatalogueDb().then((data) => {
-                      DbFunctions().getCatalogue().then((data) => setState(() {
-                            appState.setCatalogueList(data);
-                          }))
-                    });
-              },
+              onPressed: appState.catalogueRefreshDisabled
+                  ? null
+                  : () async {
+                      appState.disableCatalogueRefresh();
+                      if (!kIsWeb) {
+                        Fluttertoast.showToast(msg: 'Music catalogue updating');
+                      }
+                      updateCatalogueDb().then((data) => {
+                            DbFunctions()
+                                .getCatalogue()
+                                .then((data) => setState(() {
+                                      appState.setCatalogueList(data);
+                                    }))
+                          });
+                      Timer(const Duration(seconds: 4),
+                          appState.enableCatalogueRefresh);
+                    },
             )
           ],
         ),
