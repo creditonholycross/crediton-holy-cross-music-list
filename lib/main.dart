@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cpc_music_list/helper/dbFunctions.dart';
 import 'package:flutter_cpc_music_list/helper/fetchCatalogue.dart';
@@ -15,6 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   if (kIsWeb) {
@@ -56,6 +59,8 @@ class ServiceState extends ChangeNotifier {
       List.generate(26, (index) => String.fromCharCode(index + 65));
   bool initMusicSpinner = true;
   bool initCatalogueSpinner = true;
+  bool refreshDisabled = false;
+  bool catalogueRefreshDisabled = false;
 
   void setCurrentService(Service service) {
     currentService = service;
@@ -132,6 +137,26 @@ class ServiceState extends ChangeNotifier {
     navScrollIndexMapping = createIndexes(catalogueList);
     alphabetList = navScrollIndexMapping.keys.toList();
     navIndex = 0;
+  }
+
+  void enableRefresh() {
+    refreshDisabled = false;
+    notifyListeners();
+  }
+
+  void disableRefresh() {
+    refreshDisabled = true;
+    notifyListeners();
+  }
+
+  void enableCatalogueRefresh() {
+    catalogueRefreshDisabled = false;
+    notifyListeners();
+  }
+
+  void disableCatalogueRefresh() {
+    catalogueRefreshDisabled = true;
+    notifyListeners();
   }
 }
 
@@ -234,30 +259,41 @@ class _MyHomePageState extends State<MyHomePage> {
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.refresh),
-                onPressed: () async {
-                  setState(() {
-                    updateMusicDb().then((data) => {
-                          DbFunctions()
-                              .getServiceList()
-                              .then((data) => setState(() {
-                                    context.read<ServiceState>().serviceList =
-                                        data;
-                                    serviceList = data;
-                                    DbFunctions()
-                                        .getNextService()
-                                        .then((data) => setState(() {
-                                              context
-                                                  .read<ServiceState>()
-                                                  .nextService = data;
-                                              context
-                                                  .read<ServiceState>()
-                                                  .initMusicSpinner = false;
-                                              wearOsSync(data);
-                                            }));
-                                  }))
+                onPressed: appState.refreshDisabled
+                    ? null
+                    : () async {
+                        appState.disableRefresh();
+                        print('Music lists updating');
+                        if (!kIsWeb) {
+                          Fluttertoast.showToast(msg: 'Music lists updating');
+                        }
+                        setState(() {
+                          updateMusicDb().then((data) => {
+                                DbFunctions()
+                                    .getServiceList()
+                                    .then((data) => setState(() {
+                                          context
+                                              .read<ServiceState>()
+                                              .serviceList = data;
+                                          serviceList = data;
+                                          DbFunctions()
+                                              .getNextService()
+                                              .then((data) => setState(() {
+                                                    context
+                                                        .read<ServiceState>()
+                                                        .nextService = data;
+                                                    context
+                                                            .read<ServiceState>()
+                                                            .initMusicSpinner =
+                                                        false;
+                                                    wearOsSync(data);
+                                                  }));
+                                        }))
+                              });
                         });
-                  });
-                },
+                        Timer(
+                            const Duration(seconds: 4), appState.enableRefresh);
+                      },
               )
             ]),
         body: SingleChildScrollView(
@@ -374,13 +410,45 @@ class _ServiceListPageState extends State<ServiceListPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  setState(() {
-                    appState.updateMusicList();
-                  });
-                },
-              )
+                  icon: const Icon(Icons.refresh),
+                  onPressed: appState.refreshDisabled
+                      ? null
+                      : () async {
+                          appState.disableRefresh();
+                          print('Music lists updating');
+                          if (!kIsWeb) {
+                            Fluttertoast.showToast(msg: 'Music lists updating');
+                          }
+                          () {
+                            setState(() {
+                              updateMusicDb().then((data) => {
+                                    DbFunctions()
+                                        .getServiceList()
+                                        .then((data) => setState(() {
+                                              context
+                                                  .read<ServiceState>()
+                                                  .serviceList = data;
+                                              serviceList = data;
+                                              DbFunctions()
+                                                  .getNextService()
+                                                  .then((data) => setState(() {
+                                                        context
+                                                            .read<
+                                                                ServiceState>()
+                                                            .nextService = data;
+                                                        context
+                                                            .read<
+                                                                ServiceState>()
+                                                            .initMusicSpinner = false;
+                                                        wearOsSync(data);
+                                                      }));
+                                            }))
+                                  });
+                            });
+                          };
+                          Timer(const Duration(seconds: 4),
+                              appState.enableRefresh);
+                        })
             ]),
         body: SingleChildScrollView(
           child: Center(child: () {
@@ -400,7 +468,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
                   physics: const ScrollPhysics(),
                   itemCount: serviceList!.length,
                   itemBuilder: (context, index) {
-                    var date = Music.parseDate(serviceList[index].date);
+                    var date = Music.parseDate(serviceList![index].date);
                     return ListTile(
                       title: Text(date,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -419,7 +487,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
                       trailing: const Icon(Icons.info_outline),
                       isThreeLine: true,
                       onTap: () {
-                        appState.setCurrentService(serviceList[index]);
+                        appState.setCurrentService(serviceList![index]);
                         Navigator.of(context).push(
                           MaterialPageRoute(
                               builder: (context) => const ServiceMusicPage()),
