@@ -311,11 +311,22 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     if (appState.nextService != null)
                       ListTile(
-                        title: const Text('Next service:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(
-                            '${Music.parseDate(appState.nextService!.date)} - ${appState.nextService!.serviceType}'),
-                      ),
+                          title: const Text('Next service:',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text.rich(TextSpan(children: [
+                            TextSpan(
+                                text:
+                                    '${Music.parseDate(appState.nextService!.date)} - ${appState.nextService!.serviceType}',
+                                style: const TextStyle(fontSize: 16)),
+                            TextSpan(
+                                text:
+                                    ' \nRehearsal - ${Music.formatTime(appState.nextService!.rehearsalTime)}\nService - ${Music.formatTime(appState.nextService!.time)}',
+                                style: const TextStyle(
+                                    fontStyle: FontStyle.italic, fontSize: 14))
+                          ]))
+                          //  Text(
+                          //     '${Music.parseDate(appState.nextService!.date)} - ${appState.nextService!.serviceType}'),
+                          ),
                     if (appState.nextService != null)
                       Card(
                         child: ListTile(
