@@ -45,7 +45,9 @@ class _CataloguePageState extends State<CataloguePage> {
     'TTBB',
     'TB',
     'SS',
-    'Upper'
+    'Upper',
+    'Unison',
+    'SSAATTBB'
   ];
 
   late Future<List<Catalogue>?> catalogueFuture;

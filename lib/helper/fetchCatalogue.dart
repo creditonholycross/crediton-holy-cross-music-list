@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import "package:collection/collection.dart";
 
 var catalogueLink =
-    'https://docs.google.com/spreadsheets/d/1Re82nHjPfZdGTDCeb88xeXOSXZFfK3x4oPe5fkxmb_o/gviz/tq?tqx=out:csv&sheet=sheet1';
+    'https://docs.google.com/spreadsheets/d/1VwqZ7_RjaS58UwxXzdzG6TeZtXDPLdj0N3t894Sm_iQ/gviz/tq?tqx=out:csv&sheet=sheet1';
 
 Future<void> fetchCatalogue() async {
   final count = await DbFunctions().getCatalogueCount();
@@ -16,7 +16,6 @@ Future<void> fetchCatalogue() async {
     print('fetching catalogue');
     updateCatalogueDb();
   }
-  // return await DbFunctions().getCatalogue();
 }
 
 Future<void> updateCatalogueDb() async {
@@ -46,13 +45,3 @@ List<Catalogue> parseCsv(String csv) {
 
   return catalogueList;
 }
-
-// List<Service> groupMusic(List<Music> musicList) {
-//   var newMap = groupBy(musicList, (item) => '${item.date},${item.serviceType}');
-
-//   var serviceList = <Service>[];
-
-//   newMap.forEach((k, v) => serviceList.add(
-//       Service(date: k.split(',')[0], serviceType: k.split(',')[1], music: v)));
-//   return serviceList;
-// }
