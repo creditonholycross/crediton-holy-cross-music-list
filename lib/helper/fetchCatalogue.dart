@@ -21,7 +21,13 @@ Future<void> fetchCatalogue() async {
 
 Future<void> updateCatalogueDb() async {
   print('updating db');
-  final response = await http.get((Uri.parse(catalogueLink)));
+  http.Response response;
+  try {
+    response = await http.get((Uri.parse(catalogueLink)));
+  } catch (e) {
+    return;
+  }
+
   if (response.statusCode == 200) {
     var parsedCatalogue = parseCsv(response.body);
     if (parsedCatalogue.isEmpty) {

@@ -10,18 +10,19 @@ class Music {
   final String title;
   final String? composer;
   final String? link;
+  final String? serviceOrganist;
 
-  const Music({
-    required this.date,
-    required this.time,
-    required this.rehearsalTime,
-    required this.serviceType,
-    required this.musicType,
-    required this.title,
-    this.composer,
-    this.link,
-    this.id,
-  });
+  const Music(
+      {required this.date,
+      required this.time,
+      required this.rehearsalTime,
+      required this.serviceType,
+      required this.musicType,
+      required this.title,
+      this.composer,
+      this.link,
+      this.id,
+      this.serviceOrganist});
 
   factory Music.fromCsv(Map<dynamic, dynamic> csv) {
     return switch (csv) {
@@ -33,7 +34,8 @@ class Music {
         'type': String musicType,
         'title': String title,
         'composer': String? composer,
-        'link': String? link
+        'link': String? link,
+        'organist': String? serviceOrganist
       } =>
         Music(
             date: date.replaceAll('-', ''),
@@ -43,7 +45,8 @@ class Music {
             musicType: musicType,
             title: title,
             composer: composer,
-            link: link),
+            link: link,
+            serviceOrganist: serviceOrganist),
       _ => throw const FormatException('Failed to load music from csv.'),
     };
   }
@@ -59,7 +62,8 @@ class Music {
         'musicType': String musicType,
         'title': String title,
         'composer': String? composer,
-        'link': String? link
+        'link': String? link,
+        'serviceOrganist': String? serviceOrganist
       } =>
         Music(
             date: date.toString(),
@@ -69,7 +73,8 @@ class Music {
             musicType: musicType,
             title: title,
             composer: composer,
-            link: link),
+            link: link,
+            serviceOrganist: serviceOrganist),
       {
         'id': String id,
         'service_date': int date,
@@ -79,7 +84,8 @@ class Music {
         'musicType': String musicType,
         'title': int title,
         'composer': String? composer,
-        'link': String? link
+        'link': String? link,
+        'serviceOrganist': String? serviceOrganist
       } =>
         Music(
             date: date.toString(),
@@ -89,7 +95,8 @@ class Music {
             musicType: musicType,
             title: title.toString(),
             composer: composer,
-            link: link),
+            link: link,
+            serviceOrganist: serviceOrganist),
       {
         'id': String id,
         'service_date': int date,
@@ -99,7 +106,8 @@ class Music {
         'musicType': String musicType,
         'title': String title,
         'composer': String? composer,
-        'link': String? link
+        'link': String? link,
+        'serviceOrganist': String? serviceOrganist
       } =>
         Music(
             date: date.toString(),
@@ -109,7 +117,8 @@ class Music {
             musicType: musicType,
             title: title.toString(),
             composer: composer,
-            link: link),
+            link: link,
+            serviceOrganist: serviceOrganist),
       {
         'id': String id,
         'service_date': int date,
@@ -119,7 +128,8 @@ class Music {
         'musicType': String musicType,
         'title': int title,
         'composer': String? composer,
-        'link': String? link
+        'link': String? link,
+        'serviceOrganist': String? serviceOrganist
       } =>
         Music(
             date: date.toString(),
@@ -129,7 +139,8 @@ class Music {
             musicType: musicType,
             title: title.toString(),
             composer: composer,
-            link: link),
+            link: link,
+            serviceOrganist: serviceOrganist),
       _ => throw const FormatException('Failed to load music from db.'),
     };
   }
@@ -144,7 +155,8 @@ class Music {
       'musicType': musicType,
       'title': title,
       'composer': composer,
-      'link': link
+      'link': link,
+      'serviceOrganist': serviceOrganist
     };
   }
 

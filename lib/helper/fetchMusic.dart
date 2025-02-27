@@ -27,7 +27,7 @@ Future<void> updateMusicDb() async {
   print('updating db');
 
   String musicURI;
-  final response;
+  http.Response response;
 
   if (kDebugMode) {
     musicURI = testingMusicLink;
@@ -86,11 +86,12 @@ List<Service> groupMusic(List<Music> musicList) {
 
   var serviceList = <Service>[];
 
-  newMap.forEach((k, v) => serviceList.add(Service(
-      date: k.split(',')[0],
-      time: v[0].time,
-      rehearsalTime: v[0].rehearsalTime,
-      serviceType: k.split(',')[1],
-      music: v)));
+  newMap.forEach((k, v) => serviceList.add(Service.createService(k, v)));
+  // Service(
+  //     date: k.split(',')[0],
+  //     time: v[0].time,
+  //     rehearsalTime: v[0].rehearsalTime,
+  //     serviceType: k.split(',')[1],
+  //     music: v)));
   return serviceList;
 }

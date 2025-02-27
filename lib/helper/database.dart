@@ -27,14 +27,14 @@ class MusicDatabaseHelper {
     print('Opening db $musicTable');
 
     var musicDatabase = await openDatabase(path,
-        version: 2, onCreate: _createTable, onUpgrade: _upgradeTable);
+        version: 3, onCreate: _createTable, onUpgrade: _upgradeTable);
 
     return musicDatabase;
   }
 
   void _createTable(Database db, int newVersion) async {
     var query =
-        'CREATE TABLE $musicTable (id STRING PRIMARY KEY, service_date INT, service_time INT, rehearsalTime INT, serviceType String, musicType STRING, title STRING, composer STRING, link STRING)';
+        'CREATE TABLE $musicTable (id STRING PRIMARY KEY, service_date INT, service_time INT, rehearsalTime INT, serviceType String, musicType STRING, title STRING, composer STRING, link STRING, serviceOrganist STRING)';
     print('Executing query $query');
     await db.execute(query);
     print('Table created');
@@ -43,6 +43,9 @@ class MusicDatabaseHelper {
   void _upgradeTable(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       db.execute("ALTER TABLE $musicTable ADD COLUMN rehearsalTime INT;");
+    }
+    if (oldVersion < 3) {
+      db.execute("ALTER TABLE $musicTable ADD COLUMN serviceOrganist string;");
     }
     print('Table upgraded');
   }
