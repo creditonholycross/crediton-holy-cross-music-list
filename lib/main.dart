@@ -200,34 +200,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    DbFunctions().getServiceList().then((data) => setState(() {
-          context.read<ServiceState>().serviceList = data;
-          serviceList = data;
-          if (data == null) {
-            updateMusicDb().then((data) => {
-                  DbFunctions().getServiceList().then((data) => setState(() {
-                        context.read<ServiceState>().serviceList = data;
-                        serviceList = data;
-                        DbFunctions()
-                            .getNextService()
-                            .then((data) => setState(() {
-                                  context.read<ServiceState>().nextService =
-                                      data;
-                                  context
-                                      .read<ServiceState>()
-                                      .initMusicSpinner = false;
-                                  wearOsSync(data);
-                                }));
-                      }))
-                });
-          } else {
-            DbFunctions().getNextService().then((data) => setState(() {
-                  context.read<ServiceState>().nextService = data;
-                  context.read<ServiceState>().initMusicSpinner = false;
-                  wearOsSync(data);
-                }));
-          }
-        }));
+    print("App init");
+    updateMusicDb().then((data) => {
+          DbFunctions().getServiceList().then((data) => setState(() {
+                context.read<ServiceState>().serviceList = data;
+                serviceList = data;
+                DbFunctions().getNextService().then((data) => setState(() {
+                      context.read<ServiceState>().nextService = data;
+                      context.read<ServiceState>().initMusicSpinner = false;
+                      wearOsSync(data);
+                    }));
+              }))
+        });
 
     DbFunctions().getCatalogueCount().then((data) => setState(() {
           catalogueCount = data;

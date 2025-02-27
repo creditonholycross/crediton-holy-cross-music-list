@@ -5,6 +5,7 @@ import 'package:flutter_cpc_music_list/models/service.dart';
 import 'package:http/http.dart' as http;
 import "package:collection/collection.dart";
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 var musicLink =
     'https://docs.google.com/spreadsheets/d/1r71O_Bm_-dkKBTtyAPMYMfhh1lg5-MwypKAnEs2eYkQ/gviz/tq?tqx=out:csv&sheet=schedule';
@@ -26,23 +27,36 @@ Future<void> updateMusicDb() async {
   print('updating db');
 
   String musicURI;
+  final response;
 
-  if (kReleaseMode) {
-    musicURI = musicLink;
-  } else {
+  if (kDebugMode) {
     musicURI = testingMusicLink;
+  } else {
+    musicURI = musicLink;
   }
 
-  final response = await http.get((Uri.parse(musicURI)));
+  try {
+    response = await http.get((Uri.parse(musicURI)));
+  } catch (e) {
+    print(e);
+    if (!kIsWeb) {
+      Fluttertoast.showToast(
+          msg: 'Failed to update music, check your internet connection');
+    }
+    return;
+  }
+
   if (response.statusCode == 200) {
     var parsedMusic = parseCsv(response.body);
     if (parsedMusic.isEmpty) {
-      return null;
+      return;
     }
     await DbFunctions().deleteAllMusic();
     await DbFunctions().addMultipleMusic(parsedMusic);
   } else {
-    throw Exception('Failed to load music.');
+    if (!kIsWeb) {
+      Fluttertoast.showToast(msg: 'Failed to update music');
+    }
   }
 }
 
@@ -54,7 +68,15 @@ List<Music> parseCsv(String csv) {
   var mappedList =
       parsedList.skip(1).map((v) => Map.fromIterables(keys, v)).toList();
 
-  var musicList = mappedList.map((e) => Music.fromCsv(e)).toList();
+  var musicList;
+
+  try {
+    musicList = mappedList.map((e) => Music.fromCsv(e)).toList();
+  } on FormatException {
+    if (!kIsWeb) {
+      Fluttertoast.showToast(msg: 'Failed to update music');
+    }
+  }
 
   return musicList;
 }
