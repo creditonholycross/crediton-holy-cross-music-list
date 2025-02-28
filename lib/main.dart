@@ -514,6 +514,7 @@ class ServiceMusicPage extends StatelessWidget {
             title: Text(Music.parseDate(currentService.date))),
         body: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.all(8),
@@ -523,6 +524,12 @@ class ServiceMusicPage extends StatelessWidget {
                       fontWeight: FontWeight.bold, fontSize: 24),
                 ),
               ),
+              if (currentService.organist! != '')
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text('Organist: ${currentService.organist!}',
+                      style: const TextStyle(fontSize: 16)),
+                ),
               ListView.builder(
                 scrollDirection: Axis.vertical,
                 physics: const ScrollPhysics(),

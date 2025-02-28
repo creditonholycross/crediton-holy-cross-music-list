@@ -6,23 +6,34 @@ class Service {
   final String? rehearsalTime;
   final String serviceType;
   final List<Music> music;
+  final String? organist;
 
-  const Service({
-    required this.date,
-    required this.time,
-    required this.rehearsalTime,
-    required this.serviceType,
-    required this.music,
-  });
+  const Service(
+      {required this.date,
+      required this.time,
+      required this.rehearsalTime,
+      required this.serviceType,
+      required this.music,
+      required this.organist});
 
-  factory Service.createService(
-      String id, time, rehearsalTime, List<Music> music) {
+  factory Service.createService(String id, List<Music> music) {
     var idSplit = id.split(',');
+    var organists = [];
+    for (var item in music) {
+      if (['', null].contains(item.serviceOrganist)) {
+        continue;
+      }
+      if (!organists.contains(item.serviceOrganist)) {
+        organists.add(item.serviceOrganist);
+      }
+    }
+
     return Service(
         date: idSplit[0],
-        time: time,
-        rehearsalTime: rehearsalTime,
+        time: music[0].time,
+        rehearsalTime: music[0].rehearsalTime,
         serviceType: idSplit[1],
-        music: music);
+        music: music,
+        organist: organists.join(', '));
   }
 }
